@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IA monótona vs. IA no-monótona</title>
+    <meta name="description" content="Animación interactiva: cómo razona una IA monótona y una no-monótona (Tema 2.7)." />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='14' width='22' height='22' transform='rotate(45 17 25)' fill='none' stroke='%235cd2ff' stroke-width='4'/%3E%3Ccircle cx='44' cy='38' r='13' fill='none' stroke='%23ff4fd8' stroke-width='4'/%3E%3C/svg%3E"
+    />
+    <link rel="preload" href="fuentes/exo2.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fuentes/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="css/estilos.css" />
+  </head>
+  <body>
+    <div id="escenario" class="fase-portada">
+      <canvas id="fondo" aria-hidden="true"></canvas>
+      <div class="nebulosa nebulosa--mono" aria-hidden="true"></div>
+      <div class="nebulosa nebulosa--nm" aria-hidden="true"></div>
+
+      <header id="barra">
+        <div class="barra__tema"><span class="barra__chip">2.7</span>Conocimiento no-monótono y otras lógicas</div>
+        <div class="barra__escena">
+          <span id="escena-etiqueta" class="barra__etiqueta"></span>
+          <span id="escena-titulo" class="barra__titulo"></span>
+        </div>
+        <div class="barra__derecha">
+          <div id="motor" class="motor" title="El razonamiento de las dos IAs se calcula en el servidor Node.js">
+            <i></i><span>Motor Node.js</span><b id="motor-ms">conectando…</b>
+          </div>
+          <div id="progreso" class="progreso"></div>
+        </div>
+      </header>
+
+      <main id="duelo">
+        <section id="lado-mono" class="lado lado--mono" aria-label="IA monótona"></section>
+        <div id="haz" aria-hidden="true">
+          <div class="haz__linea"></div>
+          <span class="haz__etiqueta">misma<br />entrada</span>
+        </div>
+        <section id="lado-nomono" class="lado lado--nm" aria-label="IA no-monótona"></section>
+      </main>
+
+      <footer id="narracion">
+        <p id="narracion-texto" class="narracion__texto" aria-live="polite"></p>
+        <div id="narracion-pasos" class="narracion__pasos"></div>
+        <div id="auto-barra" class="auto-barra"><i></i></div>
+      </footer>
+
+      <section id="laboratorio" class="lab" hidden aria-label="Laboratorio"></section>
+
+      <section id="portada" class="portada">
+        <div class="portada__tema">Tema 2.7 · Conocimiento no-monótono y otras lógicas</div>
+        <h1 class="portada__titulo">Dos formas de pensar</h1>
+        <div class="portada__duelo">
+          <span class="t-mono">IA monótona</span><span class="portada__vs">vs</span><span class="t-nm">IA no-monótona</span>
+        </div>
+        <p class="portada__sub">Qué pasa cuando una inteligencia artificial descubre que estaba equivocada.</p>
+        <div class="portada__inicio"><kbd>→</kbd> o clic para comenzar</div>
+      </section>
+
+      <section id="tarjeta" class="tarjeta" hidden></section>
+      <section id="final" class="final" hidden></section>
+      <div id="paquete" class="paquete" hidden></div>
+      <canvas id="fx" aria-hidden="true"></canvas>
+
+      <nav id="controles" class="controles" aria-label="Controles">
+        <button data-accion="anterior" title="Anterior (←)">
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+        </button>
+        <button data-accion="auto" title="Reproducción automática (A)">
+          <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z" /></svg>
+          <svg class="i-pausa" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" /></svg>
+        </button>
+        <button data-accion="siguiente" title="Siguiente (→)">
+          <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+        </button>
+        <span class="controles__sep"></span>
+        <button data-accion="lab" title="Laboratorio (L)">
+          <svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3M7 15h10" /></svg>
+        </button>
+        <button data-accion="sonido" title="Sonido (M)">
+          <svg class="i-sonido" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" /></svg>
+          <svg class="i-mudo" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10zM17 9l5 6M22 9l-5 6" /></svg>
+        </button>
+        <button data-accion="pantalla" title="Pantalla completa (F)">
+          <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+        </button>
+        <button data-accion="ayuda" title="Atajos de teclado (H)">
+          <svg viewBox="0 0 24 24"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.5" /></svg>
+        </button>
+      </nav>
+
+      <section id="ayuda" class="ayuda" hidden>
+        <h2>Atajos</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Clic</kbd></dt><dd>Siguiente paso</dd>
+          <dt><kbd>←</kbd></dt><dd>Paso anterior</dd>
+          <dt><kbd>1</kbd>…<kbd>8</kbd></dt><dd>Ir a una escena</dd>
+          <dt><kbd>A</kbd></dt><dd>Reproducción automática</dd>
+          <dt><kbd>L</kbd></dt><dd>Laboratorio (modo libre)</dd>
+          <dt><kbd>M</kbd></dt><dd>Sonido</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>Inicio</kbd></dt><dd>Volver a la portada</dd>
+        </dl>
+        <p>Los controles con clicker de presentación (Re Pág / Av Pág) también funcionan.</p>
+      </section>
+
+      <div id="carga" class="carga">
+        <div class="carga__anillo"></div>
+        <p id="carga-texto">Conectando con el motor de razonamiento…</p>
+      </div>
+      <script>
+        // Abierto con doble clic (file://): el motor no está corriendo
+        if (location.protocol === 'file:') {
+          document.getElementById('carga-texto').innerHTML =
+            'Esta animación necesita su servidor Node.js.<br>Abre una terminal en la carpeta del proyecto y ejecuta <code>npm start</code>.';
+        }
+      </script>
+    </div>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

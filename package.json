@@ -1,0 +1,15 @@
+{
+  "name": "ia-monotona-vs-no-monotona",
+  "version": "1.0.0",
+  "description": "Animación interactiva: cómo razona una IA monótona y una no-monótona (Tema 2.7: Conocimiento no-monótono y otras lógicas).",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
